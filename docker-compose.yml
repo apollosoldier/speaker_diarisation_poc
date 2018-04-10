@@ -1,0 +1,24 @@
+version: "3"
+services:
+  web:
+    build: .
+    ports:
+    - "5000:5000"
+#    volumes:
+#    - .:/code
+#    - logvolume01:/var/log
+
+#  webcaster:
+#    image: nicktgr15/webcaster-docker:latest
+#    ports:
+#      - 8000:8000
+#    entrypoint: python -m SimpleHTTPServer
+#  icecast:
+#    image: moul/icecast
+#    ports:
+#      - 8082:8000
+#  liquidsoap:
+#    image: nicktgr15/liquidsoap-docker-from-source:latest
+#    ports:
+#      - 8080:8080
+#    entrypoint: /usr/local/bin/liquidsoap 'output.icecast(%vorbis, host = "icecast", port = 8000, password = "hackme", mount = "liq.ogg", mksafe(input.harbor("mount",port=8080)))'
