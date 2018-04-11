@@ -1,24 +1,43 @@
 version: "3"
 services:
+
   web:
     build: .
     ports:
     - "5000:5000"
-#    volumes:
-#    - .:/code
-#    - logvolume01:/var/log
 
-#  webcaster:
-#    image: nicktgr15/webcaster-docker:latest
-#    ports:
-#      - 8000:8000
-#    entrypoint: python -m SimpleHTTPServer
-#  icecast:
-#    image: moul/icecast
-#    ports:
-#      - 8082:8000
-#  liquidsoap:
-#    image: nicktgr15/liquidsoap-docker-from-source:latest
-#    ports:
-#      - 8080:8080
-#    entrypoint: /usr/local/bin/liquidsoap 'output.icecast(%vorbis, host = "icecast", port = 8000, password = "hackme", mount = "liq.ogg", mksafe(input.harbor("mount",port=8080)))'
+  zookeeper:
+    image: confluent/zookeeper
+    ports:
+      - "2181:2181"
+    volumes:
+      - /tmp/zookeeper:/var/lib/zookeeper
+
+  kafka:
+    image: wurstmeister/kafka
+    ports:
+      - "9092:9092"
+    volumes:
+      - /tmp/kafka:/var/lib/kafka
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: localhost
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_PORT: 9092
+      KAFKA_DELETE_TOPIC_ENABLE: "true"
+      KAFKA_LOG_RETENTION_HOURS: 24
+
+  kafka-manager:
+    image: sheepkiller/kafka-manager
+    ports:
+      - "9000:9000"
+    environment:
+      ZK_HOSTS: zookeeper:2181
+
+  db:
+    image: postgres:9.6
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
+      POSTGRES_DB: speaker_diarisation
+    volumes:
+      - /tmp/postgres:/var/lib/postgresql/data
