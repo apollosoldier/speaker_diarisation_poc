@@ -7,4 +7,4 @@ COPY src /src
 
 WORKDIR src
 
-CMD python app.py
+CMD ./bootstrap.sh

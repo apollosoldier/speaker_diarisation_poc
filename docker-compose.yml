@@ -14,7 +14,7 @@ services:
       - /tmp/zookeeper:/var/lib/zookeeper
 
   kafka:
-    image: wurstmeister/kafka
+    image: wurstmeister/kafka:1.0.0
     ports:
       - "9092:9092"
     volumes:
@@ -34,7 +34,9 @@ services:
       ZK_HOSTS: zookeeper:2181
 
   db:
-    image: postgres:9.6
+    image: postgres:10.3
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_PASSWORD: password
       POSTGRES_USER: postgres
