@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-sleep 10
+sleep 15
+
 python create_db.py
 python worker.py &
 python app.py

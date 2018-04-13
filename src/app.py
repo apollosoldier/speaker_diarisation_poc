@@ -28,13 +28,12 @@ def submit():
     producer = KafkaProducer(
         bootstrap_servers='kafka:9092',
         value_serializer=lambda m: json.dumps(m).encode('utf-8'),
-        api_version=(1, 0, 0))
+        api_version=(1, 0, 1))
 
     msg = {
         "youtubeurl": youtubeurl
     }
     producer.send('foobar', msg)
-    producer.flush()
 
     db.session.add(Job(video_id=youtubeurl))
     db.session.commit()

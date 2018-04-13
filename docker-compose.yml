@@ -10,17 +10,17 @@ services:
     image: confluent/zookeeper
     ports:
       - "2181:2181"
-    volumes:
-      - /tmp/zookeeper:/var/lib/zookeeper
+#    volumes:
+#      - /tmp/zookeeper:/var/lib/zookeeper
 
   kafka:
-    image: wurstmeister/kafka:1.0.0
+    image: wurstmeister/kafka:1.0.1
     ports:
       - "9092:9092"
-    volumes:
-      - /tmp/kafka:/var/lib/kafka
+#    volumes:
+#      - /tmp/kafka:/var/lib/kafka
     environment:
-      KAFKA_ADVERTISED_HOST_NAME: localhost
+      KAFKA_ADVERTISED_HOST_NAME: kafka
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_ADVERTISED_PORT: 9092
       KAFKA_DELETE_TOPIC_ENABLE: "true"
