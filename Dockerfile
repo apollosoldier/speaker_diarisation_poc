@@ -1,13 +1,14 @@
-FROM python:3.6
-
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+FROM ubuntu:16.04
 
 RUN apt-get update
-RUN apt-get install vim -y
-RUN apt-get install youtube-dl -y
+RUN apt-get install vim python3-pip python3 -y
+RUN apt-get install youtube-dl sox ffmpeg -y
+RUN apt-get install python3-tk -y
 
-COPY src /src
+COPY requirements.txt .
+RUN pip3 install -r requirements.txt
+
+#COPY src /src
 
 WORKDIR src
 

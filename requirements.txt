@@ -3,4 +3,5 @@ flask_sqlalchemy==2.3.1
 kafka-python==1.4.2
 psycopg2==2.7.4
 librosa==0.6.0
-tenacity==4.10.0
+matplotlib==2.2.2
+pillow==5.1.0

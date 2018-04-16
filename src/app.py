@@ -1,4 +1,6 @@
-from flask import Flask
+from enum import Enum
+
+from flask import Flask, redirect
 from flask_sqlalchemy import SQLAlchemy
 from flask import render_template
 from flask import request
@@ -10,6 +12,16 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://postgres:password@db:5432/sp
 app.debug = True
 
 db = SQLAlchemy(app)
+
+
+class State(Enum):
+    SUBMITTED = 1
+    VIDEO_DOWNLOADED = 2
+    AUDIO_EXTRACTED = 3
+    WAVEFORM_GENERATED = 4
+    SPEAKERS_DETECTED = 5
+    DONE = 6
+    ERROR = 7
 
 
 class Job(db.Model):
@@ -29,6 +41,13 @@ def index():
     return render_template('index.html')
 
 
+@app.route('/view/<youtube_video_id>', methods=['DELETE'])
+def view_delete(youtube_video_id):
+    db.session.delete(Job.query.filter_by(video_id=youtube_video_id).first())
+    db.session.commit()
+    return 'Deleted video with id: %s' % youtube_video_id
+
+
 @app.route('/view/<youtube_video_id>', methods=['GET'])
 def view(youtube_video_id):
     return render_template('view.html', youtube_video_id=youtube_video_id)
@@ -44,7 +63,7 @@ def submit():
         value_serializer=lambda m: json.dumps(m).encode('utf-8'),
         api_version=(1, 0, 1))
 
-    uploaded_state = JobState.query.filter_by(name='submitted').first()
+    uploaded_state = JobState.query.filter_by(name=State.SUBMITTED.name).first()
     db.session.add(Job(video_id=youtubeurl, number_of_speakers=numberofspeakers, job_state=uploaded_state))
     db.session.commit()
 

@@ -1,10 +1,3 @@
-
-
-
-
-
-
-
 psql:
 	docker exec -it speakerdiarisationpoc_db_1 sh -c 'psql -U postgres speaker_diarisation'
 

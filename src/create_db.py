@@ -1,16 +1,9 @@
-from app import db
-import time
-from app import JobState, Job
+from app import db, JobState, State
 
 db.drop_all(bind=None)
 db.create_all()
 
-
-db.session.add(JobState(name='submitted'))
-db.session.add(JobState(name='video_downloaded'))
-db.session.add(JobState(name='audio_extracted'))
-db.session.add(JobState(name='speakers_detected'))
-db.session.add(JobState(name='done'))
-db.session.add(JobState(name='error'))
+for x in list(State):
+    db.session.add(JobState(name=x.name))
 
 db.session.commit()

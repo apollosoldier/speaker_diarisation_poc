@@ -4,6 +4,10 @@
 <!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
 <div id="player"></div>
 
+<div id="waveform" style="overflow-x: scroll; width:1000px;">
+    <img src="/static/img/waveforms/{{youtube_video_id}}.jpg" height="256"/>
+</div>
+
 <script>
     // 2. This code loads the IFrame Player API code asynchronously.
     var tag = document.createElement('script');
@@ -17,8 +21,8 @@
     var player;
     function onYouTubeIframeAPIReady() {
         player = new YT.Player('player', {
-            height: '390',
-            width: '640',
+            height: '420',
+            width: '1000',
             videoId: '{{ youtube_video_id }}',
             events: {
                 'onReady': onPlayerReady,

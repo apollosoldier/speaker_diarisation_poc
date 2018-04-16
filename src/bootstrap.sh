@@ -2,6 +2,6 @@
 
 sleep 15
 
-python create_db.py
-python worker.py &
-python app.py
+python3 create_db.py
+python3 worker.py &
+python3 app.py

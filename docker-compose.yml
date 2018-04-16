@@ -3,6 +3,8 @@ services:
 
   web:
     build: .
+    volumes:
+    - ./src:/src
     ports:
     - "5000:5000"
 
