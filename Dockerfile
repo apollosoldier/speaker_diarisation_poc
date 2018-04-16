@@ -5,6 +5,7 @@ RUN pip install -r requirements.txt
 
 RUN apt-get update
 RUN apt-get install vim -y
+RUN apt-get install youtube-dl -y
 
 COPY src /src
 
