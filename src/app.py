@@ -1,6 +1,6 @@
 from enum import Enum
 
-from flask import Flask, redirect
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask import render_template
 from flask import request
@@ -19,15 +19,17 @@ class State(Enum):
     VIDEO_DOWNLOADED = 2
     AUDIO_EXTRACTED = 3
     WAVEFORM_GENERATED = 4
-    SPEAKERS_DETECTED = 5
-    DONE = 6
-    ERROR = 7
+    AUDIO_DATA_ANALYSED = 5
+    IMAGE_DATA_ANALYSED = 6
+    DONE = 7
+    ERROR = 8
 
 
 class Job(db.Model):
     video_id = db.Column(db.String(80), primary_key=True)
     number_of_speakers = db.Column(db.Integer, nullable=False)
     state = db.Column(db.Integer, db.ForeignKey('job_state.id'), nullable=False)
+    waveform_width = db.Column(db.Integer)
 
 
 class JobState(db.Model):
@@ -50,7 +52,8 @@ def view_delete(youtube_video_id):
 
 @app.route('/view/<youtube_video_id>', methods=['GET'])
 def view(youtube_video_id):
-    return render_template('view.html', youtube_video_id=youtube_video_id)
+    job = Job.query.filter_by(video_id=youtube_video_id).first()
+    return render_template('view.html', youtube_video_id=youtube_video_id, waveform_width=job.waveform_width)
 
 
 @app.route('/submit', methods=['POST'])

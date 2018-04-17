@@ -16,12 +16,8 @@ def set_state(state, db, job):
 
 
 def main():
-    consumer = KafkaConsumer('foobar',
-                             value_deserializer=lambda m: json.loads(m.decode('utf-8')),
-                             bootstrap_servers='kafka:9092',
-                             group_id='my-group',
-                             api_version=(1, 0, 1)
-                             )
+    consumer = KafkaConsumer('foobar', value_deserializer=lambda m: json.loads(m.decode('utf-8')),
+                             bootstrap_servers='kafka:9092', group_id='my-group', api_version=(1, 0, 1))
 
     for msg in consumer:
         youtube_video_id = msg.value['youtubeurl']
@@ -41,11 +37,12 @@ def main():
 
                 y, sr = librosa.load("%s.wav" % youtube_video_id, sr=16000)
                 D = librosa.amplitude_to_db(librosa.stft(y), ref=np.max)
-                D = np.fliplr(D)
                 D = np.flipud(D)
                 D8 = (((D - D.min()) / (D.max() - D.min())) * 255.9).astype(np.uint8)
                 img = Image.fromarray(D8)
+                img = img.resize((D.shape[1], 128))
                 img.save("static/img/waveforms/%s.jpg" % youtube_video_id)
+                job.waveform_width = D.shape[1]
                 set_state(State.WAVEFORM_GENERATED, db, job)
 
                 set_state(State.DONE, db, job)
