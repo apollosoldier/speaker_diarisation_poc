@@ -1,3 +1,4 @@
+import os
 from kafka import KafkaConsumer
 import json
 import subprocess
@@ -7,6 +8,7 @@ import numpy as np
 from PIL import Image
 
 from app import db, JobState, Job, State
+from steps.face_based_segmentation import extract_images_from_video, generate_face_based_segmentation
 
 
 def set_state(state, db, job):
@@ -27,23 +29,40 @@ def main():
 
         if job is not None:
             try:
-                subprocess.check_call(['youtube-dl', '-f', '18', '-o', '%(id)s.%(ext)s',
+                subprocess.check_call(['youtube-dl', '-f', '18', '-o', 'videos/%(id)s.%(ext)s',
                                        'https://www.youtube.com/watch?v=%s' % youtube_video_id])
                 set_state(State.VIDEO_DOWNLOADED, db, job)
 
-                subprocess.check_call(['ffmpeg', '-y', '-i', '%s.mp4' % youtube_video_id, '-ar', '16000', '-ac', '1',
-                                       '%s.wav' % youtube_video_id])
+                subprocess.check_call(['ffmpeg', '-y', '-i', 'videos/%s.mp4' % youtube_video_id, '-ar', '16000', '-ac', '1',
+                                       'audios/%s.wav' % youtube_video_id])
                 set_state(State.AUDIO_EXTRACTED, db, job)
 
-                y, sr = librosa.load("%s.wav" % youtube_video_id, sr=16000)
+                y, sr = librosa.load("audios/%s.wav" % youtube_video_id, sr=16000)
                 D = librosa.amplitude_to_db(librosa.stft(y), ref=np.max)
                 D = np.flipud(D)
                 D8 = (((D - D.min()) / (D.max() - D.min())) * 255.9).astype(np.uint8)
                 img = Image.fromarray(D8)
                 img = img.resize((D.shape[1], 128))
                 img.save("static/img/waveforms/%s.jpg" % youtube_video_id)
+                duration = librosa.get_duration(y=y, sr=sr)
                 job.waveform_width = D.shape[1]
+                job.duration = duration
                 set_state(State.WAVEFORM_GENERATED, db, job)
+
+                # face based segmentation
+                extract_images_from_video(
+                    os.path.abspath('videos/%s.mp4' % youtube_video_id),
+                    os.path.abspath('video_frames')
+                )
+                generate_face_based_segmentation(
+                    youtube_video_id,
+                    os.path.abspath('video_frames/%s' % youtube_video_id),
+                    os.path.abspath('static/lbls/image'),
+                    4,
+                    os.path.abspath('models/shape_predictor_68_face_landmarks.dat'),
+                    os.path.abspath('models/dlib_face_recognition_resnet_model_v1.dat')
+                )
+                set_state(State.IMAGE_DATA_ANALYSED, db, job)
 
                 set_state(State.DONE, db, job)
 

@@ -43,5 +43,5 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_USER: postgres
       POSTGRES_DB: speaker_diarisation
-    volumes:
-      - /tmp/postgres:/var/lib/postgresql/data
+#    volumes:
+#      - /tmp/postgres:/var/lib/postgresql/data

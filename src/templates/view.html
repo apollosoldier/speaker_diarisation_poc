@@ -1,16 +1,21 @@
 <!DOCTYPE html>
 <html>
+
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+
 <body>
 
 <div id="player"></div>
 
 <div id="waveform" style="overflow-x: scroll; width:1000px; position:relative;">
 
-    <div id="position" style="width: 1px; background-color: red; height: 196px; position: absolute; z-index: 5"></div>
+    <div id="position" style="width: 1px; background-color: red; height: 265px; position: absolute; z-index: 5"></div>
     <img src="/static/img/waveforms/{{youtube_video_id}}.jpg"/>
-    <div style="position:relative; width:{{ waveform_width }}px; background: #eee; height: 64px">
-        <div style="background: red; position: absolute; left:100px; width:200px; opacity: 0.5; height:64px;"></div>
-        <div style="background: green; position: absolute; left:500px; width:200px; opacity: 0.5; height:64px;"></div>
+    <div id="image_annotations" style="position:relative; width:{{ waveform_width }}px; background: #eee; height: 64px">
+    </div>
+    <div id="audio_annotations" style="margin-top:5px; position:relative; width:{{ waveform_width }}px; background: #eee; height: 64px">
     </div>
 </div>
 
@@ -52,7 +57,7 @@
     }
 
     function getPixelFromSeconds(positionInSeconds){
-        var duration = player.getDuration();
+        var duration = {{ duration }};
         var totalPixels = {{ waveform_width }};
         return (totalPixels * positionInSeconds) / duration;
     }
@@ -70,6 +75,45 @@
             updateWaveformPosition();
         }
     }, 100);
+
+    $.getJSON('/static/lbls/image/{{youtube_video_id}}.json', function(data) {
+
+        var colors = [
+            "Red",
+            "Lime",
+            "Yellow",
+            "Olive",
+            "Green",
+            "Aqua",
+            "Teal",
+            "Blue",
+            "Navy",
+            "Fuchsia",
+            "Maroon",
+            "Purple"];
+
+        var class_color_mapping = {};
+
+        var classes = new Set();
+
+        $.each(data, function(key, value){
+            classes.add(value.label);
+        });
+        classes = Array.from(classes);
+
+        $.each(classes, function(key, value){
+            class_color_mapping[value] = colors[key];
+        });
+
+        $.each(data, function(key, value){
+            var left = getPixelFromSeconds(value.start_seconds);
+            var duration = getPixelFromSeconds(value.end_seconds - value.start_seconds);
+            var color = class_color_mapping[value.label];
+            $('#image_annotations').append(
+                '<div style="background: '+color+'; position: absolute; left:'+left+'px; width:'+duration+'px; opacity: 0.5; height:64px;">'
+            )
+        });
+    });
 
 </script>
 </body>

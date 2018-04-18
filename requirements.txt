@@ -5,3 +5,5 @@ psycopg2==2.7.4
 librosa==0.6.0
 matplotlib==2.2.2
 pillow==5.1.0
+sac==0.7.1
+dlib==19.10.0

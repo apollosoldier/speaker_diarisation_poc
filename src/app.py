@@ -29,7 +29,8 @@ class Job(db.Model):
     video_id = db.Column(db.String(80), primary_key=True)
     number_of_speakers = db.Column(db.Integer, nullable=False)
     state = db.Column(db.Integer, db.ForeignKey('job_state.id'), nullable=False)
-    waveform_width = db.Column(db.Integer)
+    waveform_width = db.Column(db.Integer, nullable=True)
+    duration = db.Column(db.Float, nullable=True)
 
 
 class JobState(db.Model):
@@ -53,7 +54,8 @@ def view_delete(youtube_video_id):
 @app.route('/view/<youtube_video_id>', methods=['GET'])
 def view(youtube_video_id):
     job = Job.query.filter_by(video_id=youtube_video_id).first()
-    return render_template('view.html', youtube_video_id=youtube_video_id, waveform_width=job.waveform_width)
+    return render_template('view.html', youtube_video_id=youtube_video_id,
+                           waveform_width=job.waveform_width, duration=job.duration)
 
 
 @app.route('/submit', methods=['POST'])
