@@ -11,9 +11,10 @@ from app import db, JobState, Job, State
 from steps.face_based_segmentation import extract_images_from_video, generate_face_based_segmentation
 
 
-def set_state(state, db, job):
+def set_state(state, db, job, error=""):
     video_downloaded_state = JobState.query.filter_by(name=state.name).first()
     job.job_state = video_downloaded_state
+    job.error_log = error
     db.session.commit()
 
 
@@ -68,7 +69,7 @@ def main():
 
             except Exception as e:
                 print(e)
-                set_state(State.ERROR, db, job)
+                set_state(State.ERROR, db, job, str(e))
 
 
 if __name__ == '__main__':

@@ -29,6 +29,7 @@ class Job(db.Model):
     video_id = db.Column(db.String(80), primary_key=True)
     number_of_speakers = db.Column(db.Integer, nullable=False)
     state = db.Column(db.Integer, db.ForeignKey('job_state.id'), nullable=False)
+    error_log = db.Column(db.Text, nullable=True)
     waveform_width = db.Column(db.Integer, nullable=True)
     duration = db.Column(db.Float, nullable=True)
 
