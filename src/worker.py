@@ -10,6 +10,7 @@ from PIL import Image
 from app import db, JobState, Job, State
 from steps.audio_based_segmentation import generate_audio_based_segmentation
 from steps.face_based_segmentation import extract_images_from_video, generate_face_based_segmentation
+from datetime import datetime
 
 
 def set_state(state, db, job, error=""):
@@ -32,6 +33,7 @@ def main():
 
         if job is not None:
             try:
+                job.start_time = datetime.utcnow()
                 subprocess.check_call(['youtube-dl', '-f', '18', '-o', 'videos/%(id)s.%(ext)s',
                                        'https://www.youtube.com/watch?v=%s' % youtube_video_id])
                 set_state(State.VIDEO_DOWNLOADED, db, job)
@@ -78,11 +80,13 @@ def main():
                 )
                 set_state(State.IMAGE_DATA_ANALYSED, db, job)
 
+                job.end_time = datetime.utcnow()
                 set_state(State.DONE, db, job)
                 consumer.commit()
 
             except Exception as e:
                 print(e)
+                job.end_time = datetime.utcnow()
                 set_state(State.ERROR, db, job, str(e))
 
 

@@ -2,10 +2,11 @@ from enum import Enum
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from flask import render_template
+from flask import render_template, url_for
 from flask import request
 from kafka import KafkaProducer
 import json
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://postgres:password@db:5432/speaker_diarisation'
@@ -32,6 +33,9 @@ class Job(db.Model):
     error_log = db.Column(db.Text, nullable=True)
     waveform_width = db.Column(db.Integer, nullable=True)
     duration = db.Column(db.Float, nullable=True)
+    upload_time = db.Column(db.DateTime, default=datetime.utcnow)
+    start_time = db.Column(db.DateTime, nullable=True)
+    end_time = db.Column(db.DateTime, nullable=True)
 
 
 class JobState(db.Model):
@@ -56,7 +60,8 @@ def view_delete(youtube_video_id):
 def view(youtube_video_id):
     job = Job.query.filter_by(video_id=youtube_video_id).first()
     return render_template('view.html', youtube_video_id=youtube_video_id,
-                           waveform_width=job.waveform_width, duration=job.duration)
+                           waveform_width=job.waveform_width, duration=job.duration,
+                           waveform_img=url_for('static', filename='img/waveforms/%s.jpg' % youtube_video_id))
 
 
 @app.route('/submit', methods=['POST'])
@@ -70,7 +75,8 @@ def submit():
         api_version=(1, 0, 1))
 
     uploaded_state = JobState.query.filter_by(name=State.SUBMITTED.name).first()
-    db.session.add(Job(video_id=youtubeurl, number_of_speakers=numberofspeakers, job_state=uploaded_state))
+    db.session.add(Job(video_id=youtubeurl, number_of_speakers=numberofspeakers,
+                       job_state=uploaded_state, start_time=datetime.utcnow()))
     db.session.commit()
 
     msg = {
