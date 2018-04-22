@@ -92,7 +92,7 @@
 
     var silence_color = "#555555";
 
-    $.getJSON('/static/lbls/audio/{{youtube_video_id}}.json', function(data) {
+    $.getJSON('{{audio_lbls}}', function(data) {
 
         var class_color_mapping = {};
 
@@ -123,7 +123,7 @@
     });
 
 
-    $.getJSON('/static/lbls/image/{{youtube_video_id}}.json', function(data) {
+    $.getJSON('{{image_lbls}}', function(data) {
 
         var class_color_mapping = {};
 

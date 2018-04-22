@@ -61,7 +61,9 @@ def view(youtube_video_id):
     job = Job.query.filter_by(video_id=youtube_video_id).first()
     return render_template('view.html', youtube_video_id=youtube_video_id,
                            waveform_width=job.waveform_width, duration=job.duration,
-                           waveform_img=url_for('static', filename='img/waveforms/%s.jpg' % youtube_video_id))
+                           waveform_img=url_for('static', filename='img/waveforms/%s.jpg' % youtube_video_id),
+                           audio_lbls=url_for('static', filename='lbls/audio/%s.json' % youtube_video_id),
+                           image_lbls=url_for('static', filename='lbls/image/%s.json' % youtube_video_id))
 
 
 @app.route('/submit', methods=['POST'])
