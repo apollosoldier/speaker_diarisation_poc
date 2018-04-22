@@ -8,6 +8,7 @@ import numpy as np
 from PIL import Image
 
 from app import db, JobState, Job, State
+from steps.audio_based_segmentation import generate_audio_based_segmentation
 from steps.face_based_segmentation import extract_images_from_video, generate_face_based_segmentation
 
 
@@ -20,7 +21,8 @@ def set_state(state, db, job, error=""):
 
 def main():
     consumer = KafkaConsumer('foobar', value_deserializer=lambda m: json.loads(m.decode('utf-8')),
-                             bootstrap_servers='kafka:9092', group_id='my-group', api_version=(1, 0, 1))
+                             bootstrap_servers='kafka:9092', group_id='my-group', api_version=(1, 0, 1),
+                             enable_auto_commit=False)
 
     for msg in consumer:
         youtube_video_id = msg.value['youtubeurl']
@@ -50,6 +52,17 @@ def main():
                 job.duration = duration
                 set_state(State.WAVEFORM_GENERATED, db, job)
 
+                # audio based segmentation
+
+                generate_audio_based_segmentation(
+                    os.path.abspath('audios/%s.wav' % youtube_video_id), 15, 20, 256, 128, 0.2,
+                    os.path.abspath('models/weights.h5'),
+                    os.path.abspath('models/scaler.pickle'),
+                    1024, 3, 1024, youtube_video_id,
+                    os.path.abspath('static/lbls/audio')
+                )
+                set_state(State.AUDIO_DATA_ANALYSED, db, job)
+
                 # face based segmentation
                 extract_images_from_video(
                     os.path.abspath('videos/%s.mp4' % youtube_video_id),
@@ -66,6 +79,7 @@ def main():
                 set_state(State.IMAGE_DATA_ANALYSED, db, job)
 
                 set_state(State.DONE, db, job)
+                consumer.commit()
 
             except Exception as e:
                 print(e)

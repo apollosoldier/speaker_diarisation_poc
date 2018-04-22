@@ -10,6 +10,7 @@ import pandas as pd
 import shutil
 import json
 
+
 def extract_images_from_video(input_video_file_path, output_dir_path):
     video_id = os.path.basename(input_video_file_path).split('.')[0]
     if os.path.isdir(os.path.join(output_dir_path, video_id)):
@@ -23,7 +24,8 @@ def extract_images_from_video(input_video_file_path, output_dir_path):
 def generate_face_based_segmentation(youtube_video_id, images_dir, lbls_dir, faces, predictor_path,
                                      face_rec_model_path):
 
-    images = glob(os.path.join(images_dir, "*.jpg"))
+    images = glob(os.path.join(images_dir, "*.jpg"))[0:100]
+    images.sort()
     timestamps = [i * (1/5.0) for i in range(0, len(images))]
     print(timestamps)
 

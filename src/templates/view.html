@@ -76,21 +76,54 @@
         }
     }, 100);
 
-    $.getJSON('/static/lbls/image/{{youtube_video_id}}.json', function(data) {
+    var colors = [
+        "Red",
+        "Lime",
+        "Yellow",
+        "Olive",
+        "Green",
+        "Aqua",
+        "Teal",
+        "Blue",
+        "Navy",
+        "Fuchsia",
+        "Maroon",
+        "Purple"];
 
-        var colors = [
-            "Red",
-            "Lime",
-            "Yellow",
-            "Olive",
-            "Green",
-            "Aqua",
-            "Teal",
-            "Blue",
-            "Navy",
-            "Fuchsia",
-            "Maroon",
-            "Purple"];
+    var silence_color = "#555555";
+
+    $.getJSON('/static/lbls/audio/{{youtube_video_id}}.json', function(data) {
+
+        var class_color_mapping = {};
+
+        var classes = new Set();
+
+        $.each(data, function(key, value){
+            classes.add(value.label);
+        });
+        classes = Array.from(classes);
+
+        $.each(classes, function(key, value){
+            if(value === "non_speech"){
+                class_color_mapping[value] = silence_color;
+            }
+            else {
+                class_color_mapping[value] = colors[key];
+            }
+        });
+
+        $.each(data, function(key, value){
+            var left = getPixelFromSeconds(value.start_seconds);
+            var duration = getPixelFromSeconds(value.end_seconds - value.start_seconds);
+            var color = class_color_mapping[value.label];
+            $('#audio_annotations').append(
+                '<div style="background: '+color+'; position: absolute; left:'+left+'px; width:'+duration+'px; opacity: 0.5; height:64px;">'
+            )
+        });
+    });
+
+
+    $.getJSON('/static/lbls/image/{{youtube_video_id}}.json', function(data) {
 
         var class_color_mapping = {};
 

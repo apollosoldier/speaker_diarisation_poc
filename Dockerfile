@@ -9,6 +9,9 @@ RUN apt-get install cmake -y
 COPY requirements.txt .
 RUN pip3 install -r requirements.txt
 RUN pip3 install scikit-image==0.13.1
+RUN pip3 install Keras==2.1.3
+RUN pip3 install tensorflow==1.4.1
+RUN pip3 install h5py==2.7.1
 
 #COPY src /src
 
