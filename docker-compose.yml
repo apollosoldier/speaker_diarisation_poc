@@ -27,6 +27,7 @@ services:
       KAFKA_ADVERTISED_PORT: 9092
       KAFKA_DELETE_TOPIC_ENABLE: "true"
       KAFKA_LOG_RETENTION_HOURS: 24
+      KAFKA_GROUP_MAX_SESSION_TIMEOUT_MS: 10800000
 
   kafka-manager:
     image: sheepkiller/kafka-manager
