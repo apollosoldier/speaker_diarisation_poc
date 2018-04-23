@@ -23,8 +23,8 @@ def set_state(state, db, job, error=""):
 def main():
     consumer = KafkaConsumer('foobar', value_deserializer=lambda m: json.loads(m.decode('utf-8')),
                              bootstrap_servers='kafka:9092', group_id='my-group', api_version=(1, 0, 1),
-                             enable_auto_commit=False, max_poll_records=1, session_timeout_ms=10800000,
-                             request_timeout_ms=10800001)
+                             enable_auto_commit=False, max_poll_records=1, session_timeout_ms=10800001,
+                             request_timeout_ms=10800002, max_poll_interval_ms=10800000)
 
     for msg in consumer:
         youtube_video_id = msg.value['youtubeurl']

@@ -3,6 +3,6 @@
 {% for job in jobs %}
 <h2>{{ job.video_id }}</h2>
 {{ job.job_state.name }}
-{{ job.job_state.error_log }}
+{{ job.error_log }}
     <a href="view/{{ job.video_id }}">View {{ job.video_id }}</a>
 {% endfor %}
