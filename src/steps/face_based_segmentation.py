@@ -24,8 +24,9 @@ def extract_images_from_video(input_video_file_path, output_dir_path):
 def generate_face_based_segmentation(youtube_video_id, images_dir, lbls_dir, faces, predictor_path,
                                      face_rec_model_path):
 
-    images = glob(os.path.join(images_dir, "*.jpg"))[0:100]
+    images = glob(os.path.join(images_dir, "*.jpg"))
     images.sort()
+    images = images[0:100]
     timestamps = [i * (1/5.0) for i in range(0, len(images))]
     print(timestamps)
 

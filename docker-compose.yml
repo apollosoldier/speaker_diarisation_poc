@@ -5,8 +5,6 @@ services:
     build: .
     volumes:
     - ./src:/src
-    environment:
-      SERVER_NAME: localhost:5000
     ports:
     - "5000:5000"
 
