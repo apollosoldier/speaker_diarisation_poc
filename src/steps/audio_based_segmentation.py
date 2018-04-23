@@ -286,3 +286,5 @@ def generate_audio_based_segmentation(audio_file, w, h, embedding_size, lstm_nod
         })
     with open(os.path.join(lbls_dir, youtube_video_id + ".json"), 'w') as outfile:
         json.dump(json_lbls, outfile)
+
+    Util.write_audacity_labels(lbls, os.path.join(lbls_dir, youtube_video_id + ".txt"))

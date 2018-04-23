@@ -6,3 +6,4 @@ src/__pycache__
 *.jpg
 *.json
 src/steps/__pycache__/
+*.txt
