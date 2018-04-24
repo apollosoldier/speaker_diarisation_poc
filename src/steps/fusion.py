@@ -1,11 +1,20 @@
 import os
 import json
+from collections import defaultdict
+import operator
+from sac.util import Util
 
 def calculate_fusion(audio_lbls, image_lbls):
     pass
 
 
-def get_highest_probability_class(start_seconds, end_seconds):
+def get_highest_probability_class(start_seconds, end_seconds, lbls):
+    classes_probability = defaultdict(int)
+    for lbl in lbls:
+        if lbl.start_seconds >= start_seconds and lbl.end_seconds <= end_seconds:
+            classes_probability[lbl.lable] += lbl.end_seconds - lbl.start_seconds
+
+    return max(classes_probability.iteritems(), key=operator.itemgetter(1))[0]
 
 
 
