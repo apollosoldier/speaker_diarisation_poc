@@ -2,22 +2,49 @@
 <html>
 
 <head>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" ></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" ></script>
 </head>
 
 <body>
 
-<div id="player"></div>
 
-<div id="waveform" style="overflow-x: scroll; width:1000px; position:relative;">
 
-    <div id="position" style="width: 1px; background-color: red; height: 265px; position: absolute; z-index: 5"></div>
-    <img src="{{waveform_img}}"/>
-    <div id="image_annotations" style="position:relative; width:{{ waveform_width }}px; background: #eee; height: 64px">
-    </div>
-    <div id="audio_annotations" style="margin-top:5px; position:relative; width:{{ waveform_width }}px; background: #eee; height: 64px">
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2 text-right">
+            <div style="height: 320px">video</div>
+            <div style="height: 128px">waveform</div>
+            <div style="height: 64px">face-based-segmentation</div>
+            <div style="height: 64px">audio-based-segmentation</div>
+            <div style="height: 64px">fusion</div>
+        </div>
+        <div class="col-md-10">
+            <div id="player"></div>
+            <div id="waveform" style="overflow-x: scroll; width:1000px; position:relative;">
+                <div id="position" style="width: 1px; background-color: red; height: 335px; position: absolute; z-index: 5"></div>
+                <img src="{{waveform_img}}"/>
+                <div id="image_annotations" style="margin-top:5px; position:relative; width:{{ waveform_width }}px; background: #eee; height: 64px">
+                </div>
+                <div id="audio_annotations" style="margin-top:5px; position:relative; width:{{ waveform_width }}px; background: #eee; height: 64px">
+                </div>
+                <div id="fusion_annotations" style="margin-top:5px; position:relative; width:{{ waveform_width }}px; background: #eee; height: 64px">
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+
+
+
 
 
 <script>
@@ -30,7 +57,7 @@
     var player;
     function onYouTubeIframeAPIReady() {
         player = new YT.Player('player', {
-            height: '420',
+            height: '320',
             width: '1000',
             playerVars: { 'autoplay': 0, 'rel': 0 },
             videoId: '{{ youtube_video_id }}',
@@ -80,11 +107,10 @@
         "Red",
         "Lime",
         "Yellow",
-        "Olive",
         "Green",
+        "Blue",
         "Aqua",
         "Teal",
-        "Blue",
         "Navy",
         "Fuchsia",
         "Maroon",
@@ -143,6 +169,37 @@
             var duration = getPixelFromSeconds(value.end_seconds - value.start_seconds);
             var color = class_color_mapping[value.label];
             $('#image_annotations').append(
+                '<div style="background: '+color+'; position: absolute; left:'+left+'px; width:'+duration+'px; opacity: 0.5; height:64px;">'
+            )
+        });
+    });
+
+
+    $.getJSON('{{fusion_lbls}}', function(data) {
+
+        var class_color_mapping = {};
+
+        var classes = new Set();
+
+        $.each(data, function(key, value){
+            classes.add(value.label);
+        });
+        classes = Array.from(classes);
+
+        $.each(classes, function(key, value){
+            if(value === "non_speech"){
+                class_color_mapping[value] = silence_color;
+            }
+            else {
+                class_color_mapping[value] = colors[key];
+            }
+        });
+
+        $.each(data, function(key, value){
+            var left = getPixelFromSeconds(value.start_seconds);
+            var duration = getPixelFromSeconds(value.end_seconds - value.start_seconds);
+            var color = class_color_mapping[value.label];
+            $('#fusion_annotations').append(
                 '<div style="background: '+color+'; position: absolute; left:'+left+'px; width:'+duration+'px; opacity: 0.5; height:64px;">'
             )
         });

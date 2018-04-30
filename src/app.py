@@ -4,9 +4,9 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask import render_template, url_for
 from flask import request
-from kafka import KafkaProducer
 import json
 from datetime import datetime
+from celery import Celery
 
 
 class ReverseProxied(object):
@@ -51,6 +51,12 @@ app.wsgi_app = ReverseProxied(app.wsgi_app)
 db = SQLAlchemy(app)
 
 
+celery_app = Celery('proj',
+             broker='pyamqp://rabitmq//',
+             backend='rpc://rabitmq//',
+             include=['tasks'])
+
+
 class State(Enum):
     SUBMITTED = 1
     VIDEO_DOWNLOADED = 2
@@ -58,8 +64,9 @@ class State(Enum):
     WAVEFORM_GENERATED = 4
     AUDIO_DATA_ANALYSED = 5
     IMAGE_DATA_ANALYSED = 6
-    DONE = 7
-    ERROR = 8
+    FUSION_APPLIED = 7
+    DONE = 8
+    ERROR = 9
 
 
 class Job(db.Model):
@@ -102,7 +109,10 @@ def view(youtube_video_id):
                            audio_lbls=url_for('static', filename='lbls/audio/%s.json' % youtube_video_id,
                                               _external=True),
                            image_lbls=url_for('static', filename='lbls/image/%s.json' % youtube_video_id,
-                                              _external=True))
+                                              _external=True),
+                           fusion_lbls=url_for('static', filename='lbls/fusion/%s.json' % youtube_video_id,
+                                              _external=True)
+                           )
 
 
 @app.route('/submit', methods=['POST'])
@@ -110,21 +120,12 @@ def submit():
     youtubeurl = request.form['youtubeurl']
     numberofspeakers = int(request.form['numberofspeakers'])
 
-    producer = KafkaProducer(
-        bootstrap_servers='kafka:9092',
-        value_serializer=lambda m: json.dumps(m).encode('utf-8'),
-        api_version=(1, 0, 1))
-
     uploaded_state = JobState.query.filter_by(name=State.SUBMITTED.name).first()
     db.session.add(Job(video_id=youtubeurl, number_of_speakers=numberofspeakers,
                        job_state=uploaded_state, start_time=datetime.utcnow()))
     db.session.commit()
 
-    msg = {
-        "youtubeurl": youtubeurl
-    }
-    producer.send('foobar', msg)
-    producer.flush()
+    celery_app.send_task('tasks.x', args=[youtubeurl], queue='lopri')
 
     return render_template('submit.html', youtubeurl=youtubeurl)
 

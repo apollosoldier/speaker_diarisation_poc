@@ -7,3 +7,4 @@ src/__pycache__
 *.json
 src/steps/__pycache__/
 *.txt
+.DS_STORE
