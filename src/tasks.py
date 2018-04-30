@@ -58,7 +58,8 @@ def x(youtube_video_id):
                 os.path.abspath('models/weights.h5'),
                 os.path.abspath('models/scaler.pickle'),
                 1024, 3, 1024, youtube_video_id,
-                os.path.abspath('static/lbls/audio')
+                os.path.abspath('static/lbls/audio'),
+                clusters=job.number_of_speakers
             )
             set_state(State.AUDIO_DATA_ANALYSED, db, job)
 
@@ -71,7 +72,7 @@ def x(youtube_video_id):
                 youtube_video_id,
                 os.path.abspath('video_frames/%s' % youtube_video_id),
                 os.path.abspath('static/lbls/image'),
-                4,
+                job.number_of_speakers,
                 os.path.abspath('models/shape_predictor_68_face_landmarks.dat'),
                 os.path.abspath('models/dlib_face_recognition_resnet_model_v1.dat')
             )
