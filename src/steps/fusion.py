@@ -39,7 +39,9 @@ def create_pairs(audio_lbls, image_lbls, duration, step):
                 audio_lbl_code = audio_lbl.label
                 break
 
-        pairs.append(Item(i, i+step, image_lbl_code, audio_lbl_code))
+        pairs.append(
+            Item(i, i+step, image_lbl_code, audio_lbl_code)
+        )
         timestamps.append(i)
 
         i += step
@@ -93,17 +95,15 @@ def detect_face_voice_mapping(pairs):
 def calculate_fusion(youtube_video_id, lbls_dir, audio_lbls, image_lbls, duration, step=0.1): # 100ms
 
     pairs, timestamps = create_pairs(audio_lbls, image_lbls, duration, step)
-
     mapping_face_to_voice = detect_face_voice_mapping(pairs)
-
     print(mapping_face_to_voice)
-
     pairs = apply_mapping_to_pairs(pairs, mapping_face_to_voice)
-
     print(pairs)
 
     for k, pair in enumerate(pairs):
-
+        if pair.image_class is None:
+            # when image is None
+            continue
         classes = pair.image_class.split(",")
         if len(classes) == 1 and pair.audio_class != 'non_speech':
             if pair.image_class != pair.audio_class:
@@ -114,7 +114,6 @@ def calculate_fusion(youtube_video_id, lbls_dir, audio_lbls, image_lbls, duratio
     print(pairs)
 
     lbls = Util.generate_labels_from_classifications([p.audio_class for p in pairs], timestamps)
-
     lbls = filter(lambda x: x.label is not None, lbls)
 
     json_lbls = []
@@ -137,6 +136,9 @@ def find_nearest_neighbours_class(position, pairs, neighbours_before_after=6):
     ]
 
     neighbour_image_classes = list(filter(lambda x: x != 'non_speech', neighbour_image_classes))
+
+    if len(neighbour_image_classes) == 0:
+        return pairs[position].audio_class
 
     neighbour_image_classes = Counter(neighbour_image_classes)
 
