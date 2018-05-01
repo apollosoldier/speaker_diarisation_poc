@@ -53,30 +53,30 @@ def x(youtube_video_id):
 
             # audio based segmentation
 
-            # generate_audio_based_segmentation(
-            #     os.path.abspath('audios/%s.wav' % youtube_video_id), 15, 20, 256, 128, 0.2,
-            #     os.path.abspath('models/weights.h5'),
-            #     os.path.abspath('models/scaler.pickle'),
-            #     1024, 3, 1024, youtube_video_id,
-            #     os.path.abspath('static/lbls/audio'),
-            #     clusters=job.number_of_speakers
-            # )
-            # set_state(State.AUDIO_DATA_ANALYSED, db, job)
-            #
-            # # face based segmentation
-            # extract_images_from_video(
-            #     os.path.abspath('videos/%s.mp4' % youtube_video_id),
-            #     os.path.abspath('video_frames')
-            # )
-            # generate_face_based_segmentation(
-            #     youtube_video_id,
-            #     os.path.abspath('video_frames/%s' % youtube_video_id),
-            #     os.path.abspath('static/lbls/image'),
-            #     job.number_of_speakers,
-            #     os.path.abspath('models/shape_predictor_68_face_landmarks.dat'),
-            #     os.path.abspath('models/dlib_face_recognition_resnet_model_v1.dat')
-            # )
-            # set_state(State.IMAGE_DATA_ANALYSED, db, job)
+            generate_audio_based_segmentation(
+                os.path.abspath('audios/%s.wav' % youtube_video_id), 15, 20, 256, 128, 0.2,
+                os.path.abspath('models/weights.h5'),
+                os.path.abspath('models/scaler.pickle'),
+                1024, 3, 1024, youtube_video_id,
+                os.path.abspath('static/lbls/audio'),
+                clusters=job.number_of_speakers
+            )
+            set_state(State.AUDIO_DATA_ANALYSED, db, job)
+
+            # face based segmentation
+            extract_images_from_video(
+                os.path.abspath('videos/%s.mp4' % youtube_video_id),
+                os.path.abspath('video_frames')
+            )
+            generate_face_based_segmentation(
+                youtube_video_id,
+                os.path.abspath('video_frames/%s' % youtube_video_id),
+                os.path.abspath('static/lbls/image'),
+                job.number_of_speakers,
+                os.path.abspath('models/shape_predictor_68_face_landmarks.dat'),
+                os.path.abspath('models/dlib_face_recognition_resnet_model_v1.dat')
+            )
+            set_state(State.IMAGE_DATA_ANALYSED, db, job)
 
             # fusion
             calculate_fusion(
