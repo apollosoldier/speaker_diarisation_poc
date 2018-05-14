@@ -148,8 +148,7 @@ def submit():
 
     celery_app.send_task('tasks.x', args=[youtubeurl], queue='lopri')
 
-    return redirect("/jobs", code=302)
-    # return render_template('submit.html', youtubeurl=youtubeurl)
+    return redirect(url_for(".jobs"), code=302)
 
 
 @app.route('/jobs')
