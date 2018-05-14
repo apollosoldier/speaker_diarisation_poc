@@ -28,8 +28,8 @@
 .jumbotron {
     margin-bottom: 0;
     background-color: #fff;
-    padding: 100px;
-    padding-bottom: 60px;
+    padding: 80px;
+    padding-bottom: 40px;
 }
 
 .jumbotron p:last-child {

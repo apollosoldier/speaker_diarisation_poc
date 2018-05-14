@@ -1,52 +1,37 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
-
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" ></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" ></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pubsub-js/1.6.0/pubsub.min.js"></script>
-</head>
-
-<body>
+{% include "header.html" %}
 
 
-
-<div class="container-fluid">
+<div class="container-fluid" style="margin-top:70px;">
     <div class="row">
-        <div class="col-md-2 text-right">
-            <div style="height: 320px">video</div>
-            <div style="height: 128px; margin-top:5px;">audio-spectrogram</div>
-            <div style="height: 64px; margin-top:5px;">face-based segmentation</div>
-            <div style="height: 64px; margin-top:5px;">audio-based segmentation</div>
-            <div style="height: 64px; margin-top:5px;">fusion</div>
-            <div style="height: 64px; margin-top:25px;">baseline mfcc clustering</div>
-        </div>
-        <div class="col-md-8">
+        <div class="col-md-10">
             <div id="player"></div>
+
+            <div style="font-size: 10px;color:gray;position:absolute;left:17px;top:389px;z-index:5;">face-based segmentation</div>
+            <div style="font-size: 10px;color:gray;position:absolute;left:17px;top:467px;z-index:5;">audio-based segmentation</div>
+            <div style="font-size: 10px;color:gray;position:absolute;left:17px;top:545px;z-index:5;">audio-visual fusion</div>
+            <div style="font-size: 10px;color:gray;position:absolute;left:17px;top:648px;z-index:5;">baseline mfcc clustering</div>
+
+
             <div id="waveform" style="overflow-x: scroll; width:100%; position:relative;">
-                <div id="position" style="width: 1px; background-color: red; height: 335px; position: absolute; z-index: 5"></div>
+                <div id="position" style="width: 1px; background-color: red; height: 298px; position: absolute; z-index: 5"></div>
                 <img src="{{waveform_img}}"/>
-                <div id="image_annotations" style="margin-top:5px; position:relative; width:{{ waveform_width }}px; background: #eee; height: 64px">
+                <div id="image_annotations" style="margin-top:14px; position:relative; width:{{ waveform_width }}px; background: #eee; height: 64px">
                 </div>
-                <div id="audio_annotations" style="margin-top:5px; position:relative; width:{{ waveform_width }}px; background: #eee; height: 64px">
+                <!--<div style="font-size: 10px;color:gray">audio-based segmentation</div>-->
+                <div id="audio_annotations" style="margin-top:14px;position:relative; width:{{ waveform_width }}px; background: #eee; height: 64px">
                 </div>
-                <div id="fusion_annotations" style="margin-top:5px; position:relative; width:{{ waveform_width }}px; background: #eee; height: 64px">
+                <!--<div style="font-size: 10px;color:gray">fusion</div>-->
+                <div id="fusion_annotations" style="margin-top:14px;position:relative; width:{{ waveform_width }}px; background: #eee; height: 64px">
                 </div>
-                <div id="mfcc_annotations" style="margin-top:25px; position:relative; width:{{ waveform_width }}px; background: #eee; height: 64px">
+                <!--<div style="font-size: 10px;color:gray;">baseline mfcc clustering</div>-->
+                <div id="mfcc_annotations" style="margin-top:39px;position:relative; width:{{ waveform_width }}px; background: #eee; height: 64px">
                 </div>
             </div>
         </div>
         <div class="col-md-2 text-left">
             <div style="height: 320px">
-                <h4>Stats</h4>
-                Number of speakers: {{ speakers }}
+                <h5>Stats</h5>
+                <p>Number of speakers: {{ speakers }}</p>
                 <strong> Image-based legend</strong>
                 <div id="image_legend"></div>
                 <strong> Audio-based legend</strong>
@@ -310,5 +295,5 @@
     });
 
 </script>
-</body>
-</html>
+
+{% include "footer.html" %}

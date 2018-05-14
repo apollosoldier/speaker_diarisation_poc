@@ -4,6 +4,10 @@
 
 
     <section class="jumbotron text-center">
+
+        <p class="lead text-muted">This is demo application based on the implementation of the semi-supervised, deep-learning, audio-visual speaker diarisation algorithm introduced <a href="#">here</a> </paper></p>
+        <p>
+
         <form action="submit" method="post" class="form-signin">
             <h1 class="jumbotron-heading">Analyse Youtube Video</h1>
             <label for="youtubeurl" class="sr-only">Youtube Video Id</label>
@@ -24,7 +28,7 @@
                 {% for job in jobs %}
                     <div class="col-md-3">
                         <div class="card mb-4 box-shadow">
-                            <a href="view/{{ job.video_id }}"><img class="card-img-top" src="/static/img/thumbs/{{job.video_id}}.jpg" alt="Card image cap">
+                            <a href="view/{{ job.video_id }}"><img class="card-img-top" src="{{url_for('static', filename='img/thumbs')}}/{{job.video_id}}.jpg" alt="Card image cap">
                             </a>
                             <div class="card-body">
                                 <p class="card-text">{{job.video_id}}</p>

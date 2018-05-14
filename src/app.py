@@ -1,12 +1,13 @@
 from enum import Enum
 
-from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask import render_template, url_for
 from flask import request
 import json
 from datetime import datetime
 from celery import Celery
+from flask import Flask,redirect
+
 
 
 class ReverseProxied(object):
@@ -88,6 +89,17 @@ class JobState(db.Model):
     name = db.Column(db.String(80))
     jobs = db.relationship('Job', backref='job_state', lazy=True)
 
+@app.after_request
+def add_header(r):
+    """
+    Add headers to both force latest IE rendering engine or Chrome Frame,
+    and also to cache the rendered page for 10 minutes.
+    """
+    r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    r.headers["Pragma"] = "no-cache"
+    r.headers["Expires"] = "0"
+    r.headers['Cache-Control'] = 'public, max-age=0'
+    return r
 
 @app.route('/index')
 @app.route('/')
@@ -136,7 +148,8 @@ def submit():
 
     celery_app.send_task('tasks.x', args=[youtubeurl], queue='lopri')
 
-    return render_template('submit.html', youtubeurl=youtubeurl)
+    return redirect("/jobs", code=302)
+    # return render_template('submit.html', youtubeurl=youtubeurl)
 
 
 @app.route('/jobs')
