@@ -89,6 +89,7 @@ class JobState(db.Model):
     jobs = db.relationship('Job', backref='job_state', lazy=True)
 
 
+@app.route('/index')
 @app.route('/')
 def index():
     job_state_done = JobState.query.filter_by(name=State.DONE.name).first()
