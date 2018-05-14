@@ -1,8 +1,33 @@
+{% include "header.html" %}
 
 
-{% for job in jobs %}
-<h2>{{ job.video_id }}</h2>
-{{ job.job_state.name }}
-{{ job.error_log }}
-    <a href="view/{{ job.video_id }}">View {{ job.video_id }}</a>
-{% endfor %}
+<div class="container" style="margin-top:100px;">
+    <h4>Jobs</h4>
+
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">Video id</th>
+                    <th scope="col">Job State</th>
+                    <th scope="col">Job Error Log</th>
+                    <th>View</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for job in jobs %}
+                <tr>
+                    <td>{{ job.video_id }}</td>
+                    <td>{{ job.job_state.name }}</td>
+                    <td>{{ job.error_log }}</td>
+                    <td><a href="view/{{ job.video_id }}">View {{ job.video_id }}</a></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+{% include "footer.html" %}

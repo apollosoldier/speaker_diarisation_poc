@@ -127,7 +127,7 @@ def calculate_fusion(youtube_video_id, lbls_dir, audio_lbls, image_lbls, duratio
         json.dump(json_lbls, outfile)
 
     Util.write_audacity_labels(lbls, os.path.join(lbls_dir, youtube_video_id + ".txt"))
-
+    return mapping_face_to_voice
 
 def find_nearest_neighbours_class(position, pairs, neighbours_before_after=6):
 

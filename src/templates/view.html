@@ -11,6 +11,7 @@
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" ></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pubsub-js/1.6.0/pubsub.min.js"></script>
 </head>
 
 <body>
@@ -21,14 +22,15 @@
     <div class="row">
         <div class="col-md-2 text-right">
             <div style="height: 320px">video</div>
-            <div style="height: 128px">waveform</div>
-            <div style="height: 64px">face-based-segmentation</div>
-            <div style="height: 64px">audio-based-segmentation</div>
-            <div style="height: 64px">fusion</div>
+            <div style="height: 128px; margin-top:5px;">waveform</div>
+            <div style="height: 64px; margin-top:5px;">face-based segmentation</div>
+            <div style="height: 64px; margin-top:5px;">audio-based segmentation</div>
+            <div style="height: 64px; margin-top:5px;">fusion</div>
+            <div style="height: 64px; margin-top:25px;">baseline mfcc clustering</div>
         </div>
-        <div class="col-md-10">
+        <div class="col-md-8">
             <div id="player"></div>
-            <div id="waveform" style="overflow-x: scroll; width:1000px; position:relative;">
+            <div id="waveform" style="overflow-x: scroll; width:100%; position:relative;">
                 <div id="position" style="width: 1px; background-color: red; height: 335px; position: absolute; z-index: 5"></div>
                 <img src="{{waveform_img}}"/>
                 <div id="image_annotations" style="margin-top:5px; position:relative; width:{{ waveform_width }}px; background: #eee; height: 64px">
@@ -37,6 +39,20 @@
                 </div>
                 <div id="fusion_annotations" style="margin-top:5px; position:relative; width:{{ waveform_width }}px; background: #eee; height: 64px">
                 </div>
+                <div id="mfcc_annotations" style="margin-top:25px; position:relative; width:{{ waveform_width }}px; background: #eee; height: 64px">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 text-left">
+            <div style="height: 320px">
+                <h4>Stats</h4>
+                Number of speakers: {{ speakers }}
+                <strong> Image-based legend</strong>
+                <div id="image_legend"></div>
+                <strong> Audio-based legend</strong>
+                <div id="audio_legend"></div>
+                <strong> Fusion Mapping</strong>
+                <div id="fusion_legend"></div>
             </div>
         </div>
     </div>
@@ -48,6 +64,61 @@
 
 
 <script>
+
+    var image_legend_subscriber = function (msg, data) {
+        var table_html = "<table class='table table-sm'><thead><tr><th>colour</th><th>label</th></tr></thead><tbody>";
+        $.each(data, function(key, value){
+            table_html += "<tr>"+
+                "<td><div style='height:10px;width:10px;background:"+value+"'></div></td><td>"+key+"</td>" +
+                "</tr>"
+        });
+        table_html += "</tbody></table>";
+        $('#image_legend').html(table_html);
+    };
+
+    PubSub.subscribe('image_legend', image_legend_subscriber);
+
+
+    var audio_legend_subscriber = function (msg, data) {
+        var table_html = "<table class='table table-sm'><thead><tr><th>colour</th><th>label</th></tr></thead><tbody>";
+        $.each(data, function(key, value){
+            table_html += "<tr>"+
+                "<td><div style='height:10px;width:10px;background:"+value+"'></div></td><td>"+key+"</td>" +
+                "</tr>"
+        });
+        table_html += "</tbody></table>";
+        $('#audio_legend').html(table_html);
+    };
+
+    PubSub.subscribe('audio_legend', audio_legend_subscriber);
+
+
+    var fusion_legend_subscriber = function (msg, data) {
+        var table_html = "<table class='table table-sm'><thead><tr><th>colour</th><th>label</th></tr></thead><tbody>";
+        $.each(data, function(key, value){
+            table_html += "<tr>"+
+                "<td><div style='height:10px;width:10px;background:"+value+"'></div></td><td>"+key+"</td>" +
+                "</tr>"
+        });
+        table_html += "</tbody></table>";
+        $('#fusion_legend').html(table_html);
+    };
+
+    PubSub.subscribe('fusion_legend', fusion_legend_subscriber);
+
+
+    var mappingFaceToVoice = {{mapping_face_to_voice|tojson|safe}};
+    var table_html = "<table class='table table-sm'><thead><tr><th>face lbl</th><th>voice lbl</th></tr></thead><tbody>";
+    $.each(mappingFaceToVoice, function(key, value){
+        table_html += "<tr>"+
+            "<td>"+key+"</td><td>"+value+"</td>" +
+            "</tr>"
+    });
+    table_html += "</tbody></table>";
+    $('#fusion_legend').html(table_html);
+
+
+
     var tag = document.createElement('script');
 
     tag.src = "https://www.youtube.com/iframe_api";
@@ -58,7 +129,7 @@
     function onYouTubeIframeAPIReady() {
         player = new YT.Player('player', {
             height: '320',
-            width: '1000',
+            width: '100%',
             playerVars: { 'autoplay': 0, 'rel': 0 },
             videoId: '{{ youtube_video_id }}',
             events: {
@@ -79,7 +150,8 @@
 
     function updateWaveformPosition(){
         var pixelsPosition = getPixelFromSeconds(currentTime);
-        var scrollLeft = Math.floor(pixelsPosition / 1000) * 1000;
+        var scrollLeft = Math.floor(pixelsPosition /
+            document.getElementById('waveform').offsetWidth) * document.getElementById('waveform').offsetWidth;
         document.getElementById("waveform").scrollLeft = scrollLeft;
     }
 
@@ -98,7 +170,7 @@
 
         var xx = pixelsPosition - document.getElementById("waveform").scrollLeft;
 
-        if(xx > 990 && player.getPlayerState() === YT.PlayerState.PLAYING){
+        if(xx > (document.getElementById('waveform').offsetWidth-10) && player.getPlayerState() === YT.PlayerState.PLAYING){
             updateWaveformPosition();
         }
     }, 100);
@@ -136,6 +208,7 @@
             else {
                 class_color_mapping[value] = colors[key];
             }
+            PubSub.publish("audio_legend", class_color_mapping);
         });
 
         $.each(data, function(key, value){
@@ -143,6 +216,36 @@
             var duration = getPixelFromSeconds(value.end_seconds - value.start_seconds);
             var color = class_color_mapping[value.label];
             $('#audio_annotations').append(
+                '<div style="background: '+color+'; position: absolute; left:'+left+'px; width:'+duration+'px; opacity: 0.5; height:64px;">'
+            )
+        });
+    });
+
+    $.getJSON('{{mfcc_lbls}}', function(data) {
+
+        var class_color_mapping = {};
+
+        var classes = new Set();
+
+        $.each(data, function(key, value){
+            classes.add(value.label);
+        });
+        classes = Array.from(classes);
+
+        $.each(classes, function(key, value){
+            if(value === "non_speech"){
+                class_color_mapping[value] = silence_color;
+            }
+            else {
+                class_color_mapping[value] = colors[key];
+            }
+        });
+
+        $.each(data, function(key, value){
+            var left = getPixelFromSeconds(value.start_seconds);
+            var duration = getPixelFromSeconds(value.end_seconds - value.start_seconds);
+            var color = class_color_mapping[value.label];
+            $('#mfcc_annotations').append(
                 '<div style="background: '+color+'; position: absolute; left:'+left+'px; width:'+duration+'px; opacity: 0.5; height:64px;">'
             )
         });
@@ -162,6 +265,7 @@
 
         $.each(classes, function(key, value){
             class_color_mapping[value] = colors[key];
+            PubSub.publish("image_legend", class_color_mapping);
         });
 
         $.each(data, function(key, value){

@@ -7,9 +7,11 @@ import librosa.display
 import numpy as np
 from PIL import Image
 from sac.util import Util
+from shutil import copyfile
 
 from app import db, JobState, Job, State
 from steps.audio_based_segmentation import generate_audio_based_segmentation
+import steps.mfcc
 from steps.face_based_segmentation import extract_images_from_video, generate_face_based_segmentation
 from datetime import datetime
 
@@ -31,8 +33,9 @@ def x(youtube_video_id):
     if job is not None:
         try:
             job.start_time = datetime.utcnow()
-            subprocess.check_call(['youtube-dl', '-f', '18', '-o', 'videos/%(id)s.%(ext)s',
+            subprocess.check_call(['youtube-dl', '-f', '18', '--write-thumbnail', '-o', 'videos/%(id)s.%(ext)s',
                                    'https://www.youtube.com/watch?v=%s' % youtube_video_id])
+            copyfile('videos/%s.jpg' % youtube_video_id, 'static/img/thumbs/%s.jpg' % youtube_video_id)
             set_state(State.VIDEO_DOWNLOADED, db, job)
 
             subprocess.check_call(['ffmpeg', '-y', '-i', 'videos/%s.mp4' % youtube_video_id, '-ar', '16000', '-ac', '1',
@@ -63,6 +66,18 @@ def x(youtube_video_id):
             )
             set_state(State.AUDIO_DATA_ANALYSED, db, job)
 
+            steps.mfcc.generate_audio_based_segmentation(
+                os.path.abspath('audios/%s.wav' % youtube_video_id),
+                15, 20, 256, 128, 0.2,
+                os.path.abspath('models/weights.h5'),
+                os.path.abspath('models/scaler.pickle'),
+                1024, 3, 1024, youtube_video_id,
+                os.path.abspath('static/lbls/mfcc'),
+                clusters=job.number_of_speakers
+            )
+
+            set_state(State.MFCC_ANALYSED, db, job)
+
             # face based segmentation
             extract_images_from_video(
                 os.path.abspath('videos/%s.mp4' % youtube_video_id),
@@ -79,7 +94,7 @@ def x(youtube_video_id):
             set_state(State.IMAGE_DATA_ANALYSED, db, job)
 
             # fusion
-            calculate_fusion(
+            mapping_face_to_voice = calculate_fusion(
                 youtube_video_id,
                 os.path.abspath('static/lbls/fusion'),
                 Util.read_audacity_labels(
@@ -90,6 +105,7 @@ def x(youtube_video_id):
                 ),
                 duration
             )
+            job.mapping_face_to_voice = mapping_face_to_voice
             set_state(State.FUSION_APPLIED, db, job)
 
             job.end_time = datetime.utcnow()

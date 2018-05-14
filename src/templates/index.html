@@ -1,10 +1,47 @@
-<!doctype html>
-<h1>Provide Youtube video</h1>
 
-<form action="submit" method="post">
-    Youtube url: <br>
-    <input type="text" name="youtubeurl" value="Unamij6z1io"><br>
-    Number of speakers: <br>
-    <input type="text" name="numberofspeakers" value="4"><br>
-    <input type="submit" value="Submit">
-</form>
+{% include "header.html" %}
+
+
+
+    <section class="jumbotron text-center">
+        <form action="submit" method="post" class="form-signin">
+            <h1 class="jumbotron-heading">Analyse Youtube Video</h1>
+            <label for="youtubeurl" class="sr-only">Youtube Video Id</label>
+            <input type="text" name="youtubeurl" id="youtubeurl" class="form-control" placeholder="Youtube video id" required autofocus>
+            <label for="numberofspeakers" class="sr-only">speakers</label>
+            <input type="number" name="numberofspeakers" id="numberofspeakers" class="form-control" placeholder="Number of speakers" required>
+            <button class="btn btn-lg btn-primary btn-block" type="submit">submit</button>
+        </form>
+    </section>
+
+    <div class="album py-5 bg-light">
+
+        <div class="container">
+            <h4 style="margin-bottom:20px; margin-top:-30px;">Recently Added</h4>
+
+            <div class="row">
+
+                {% for job in jobs %}
+                    <div class="col-md-3">
+                        <div class="card mb-4 box-shadow">
+                            <a href="view/{{ job.video_id }}"><img class="card-img-top" src="/static/img/thumbs/{{job.video_id}}.jpg" alt="Card image cap">
+                            </a>
+                            <div class="card-body">
+                                <p class="card-text">{{job.video_id}}</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="btn-group">
+                                        <a href="view/{{ job.video_id }}" class="btn btn-secondary btn-sm my-2">View</a>
+                                    </div>
+                                    <small class="text-muted">Speakers: {{job.number_of_speakers}}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+
+
+{% include "footer.html" %}

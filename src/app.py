@@ -64,9 +64,10 @@ class State(Enum):
     WAVEFORM_GENERATED = 4
     AUDIO_DATA_ANALYSED = 5
     IMAGE_DATA_ANALYSED = 6
-    FUSION_APPLIED = 7
-    DONE = 8
-    ERROR = 9
+    MFCC_ANALYSED = 7
+    FUSION_APPLIED = 8
+    DONE = 9
+    ERROR = 10
 
 
 class Job(db.Model):
@@ -79,6 +80,7 @@ class Job(db.Model):
     upload_time = db.Column(db.DateTime, default=datetime.utcnow)
     start_time = db.Column(db.DateTime, nullable=True)
     end_time = db.Column(db.DateTime, nullable=True)
+    mapping_face_to_voice = db.Column(db.JSON, nullable=True)
 
 
 class JobState(db.Model):
@@ -89,7 +91,9 @@ class JobState(db.Model):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    job_state_done = JobState.query.filter_by(name=State.DONE.name).first()
+    jobs = Job.query.filter_by(state=job_state_done.id).all()
+    return render_template('index.html', jobs=jobs)
 
 
 @app.route('/view/<youtube_video_id>', methods=['DELETE'])
@@ -111,7 +115,11 @@ def view(youtube_video_id):
                            image_lbls=url_for('static', filename='lbls/image/%s.json' % youtube_video_id,
                                               _external=True),
                            fusion_lbls=url_for('static', filename='lbls/fusion/%s.json' % youtube_video_id,
-                                              _external=True)
+                                              _external=True),
+                           mfcc_lbls=url_for('static', filename='lbls/mfcc/%s.json' % youtube_video_id,
+                                               _external=True),
+                           speakers=job.number_of_speakers,
+                           mapping_face_to_voice=job.mapping_face_to_voice
                            )
 
 
