@@ -9,47 +9,12 @@ services:
     - 5000:5000
     - 5555:5555
 
-#  zookeeper:
-#    image: confluent/zookeeper
-#    ports:
-#      - "2181:2181"
-#    volumes:
-#      - /tmp/zookeeper:/var/lib/zookeeper
-
-#  kafka:
-#    image: wurstmeister/kafka:1.0.1
-#    ports:
-#      - "9092:9092"
-#    volumes:
-#      - /tmp/kafka:/var/lib/kafka
-#    environment:
-#      KAFKA_ADVERTISED_HOST_NAME: kafka
-#      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-#      KAFKA_ADVERTISED_PORT: 9092
-#      KAFKA_DELETE_TOPIC_ENABLE: "true"
-#      KAFKA_LOG_RETENTION_HOURS: 24
-#      KAFKA_GROUP_MAX_SESSION_TIMEOUT_MS: 10800000
-
   rabitmq:
     image: rabbitmq:3.7.4
     ports:
       - 5672:5672
       - 5671:5671
       - 25672:25672
-
-#  flower:
-#    image: mher/flower
-#    ports:
-#      - 5555:5555
-#    entrypoint:
-#      - flower
-
-#  kafka-manager:
-#    image: sheepkiller/kafka-manager
-#    ports:
-#      - "9000:9000"
-#    environment:
-#      ZK_HOSTS: zookeeper:2181
 
   db:
     image: postgres:10.3

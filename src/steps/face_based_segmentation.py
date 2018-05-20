@@ -63,6 +63,10 @@ def generate_face_based_segmentation(youtube_video_id, images_dir, lbls_dir, fac
     print(embeddings.shape)
     print(embeddings_timestamps.shape)
 
+    if len(embeddings) == 0:
+        Util.write_audacity_labels([], os.path.join(lbls_dir, youtube_video_id + ".txt"))
+        return
+
     kmeans = KMeans(n_clusters=faces)
     kmeans.fit(embeddings)
 
