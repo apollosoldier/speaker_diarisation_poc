@@ -12,7 +12,7 @@ RUN pip3 install scikit-image==0.13.1
 RUN pip3 install Keras==2.1.3
 RUN pip3 install tensorflow==1.4.1
 RUN pip3 install h5py==2.7.1
-RUN pip3 install celery==4.1.0
+RUN pip3 install celery==4.1.1
 RUN pip3 install celery-flower==1.0.1
 
 #COPY src /src
