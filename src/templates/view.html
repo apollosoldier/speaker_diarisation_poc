@@ -6,10 +6,10 @@
         <div class="col-md-10">
             <div id="player"></div>
 
-            <div style="font-size: 10px;color:gray;position:absolute;left:17px;top:389px;z-index:5;">face-based segmentation</div>
-            <div style="font-size: 10px;color:gray;position:absolute;left:17px;top:467px;z-index:5;">audio-based segmentation</div>
-            <div style="font-size: 10px;color:gray;position:absolute;left:17px;top:545px;z-index:5;">audio-visual fusion</div>
-            <div style="font-size: 10px;color:gray;position:absolute;left:17px;top:648px;z-index:5;">baseline mfcc clustering</div>
+            <div style="font-size: 10px;color:gray;position:absolute;left:17px;top:389px;z-index:5;">face-based segmentation <a href="{{url_for('static', filename='lbls/image/')}}{{ youtube_video_id }}.txt">download</a></div>
+            <div style="font-size: 10px;color:gray;position:absolute;left:17px;top:467px;z-index:5;">audio-based segmentation <a href="{{url_for('static', filename='lbls/audio/')}}{{ youtube_video_id }}.txt">download</a></div>
+            <div style="font-size: 10px;color:gray;position:absolute;left:17px;top:545px;z-index:5;">audio-visual fusion <a href="{{url_for('static', filename='lbls/fusion/')}}{{ youtube_video_id }}.txt">download</a></div>
+            <div style="font-size: 10px;color:gray;position:absolute;left:17px;top:648px;z-index:5;">baseline mfcc clustering <a href="{{url_for('static', filename='lbls/mfcc/')}}{{ youtube_video_id }}.txt">download</a></div>
 
 
             <div id="waveform" style="overflow-x: scroll; width:100%; position:relative;">
